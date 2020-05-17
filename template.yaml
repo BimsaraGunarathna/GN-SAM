@@ -93,13 +93,61 @@ Resources:
             Bucket: !Ref GoNowVehicleImageBucket
             Events: s3:ObjectCreated:*
 
-  #S3
+  #IAM::User
+  #IAM User for the GoNowVehicleImageBucket
+  MyUser:
+    Type: AWS::IAM::User
+    Properties:
+      LoginProfile:
+        Password: MYNEW1209PASSWORD
+      UserName: GoNowImageManagementUser
+
+  #s3
   #(01) create a S3 bucket for storing images of go now app.
   GoNowVehicleImageBucket:
     Type: AWS::S3::Bucket
     Properties:
       #AccessControl: PublicRead
       BucketName: go-now-vehicle-image-bucket
+
+  #Bucket policy for GoNowVehicleImageBucket
+  SampleBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: "GoNowVehicleImageBucket"
+      PolicyDocument:
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: "Allow"
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: "GoNowVehicleImageBucket"
+                  - "/*"
+            Principal: "*"
+            Condition:
+              StringLike:
+                aws:Referer:
+                  - "http://www.example.com/*"
+                  - "http://example.com/*"
+          - Action:
+              - "s3:GetObject"
+            Effect: "Allow"
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: "GoNowVehicleImageBucket"
+                  - "/*"
+            Principal: "*"
+            Condition:
+              StringLike:
+                aws:Referer:
+                  - "http://www.example.com/*"
+                  - "http://example.com/*"
 
   #DynamoDB Tables
   #(01) configure primary dynamodb table
@@ -154,7 +202,7 @@ Resources:
         - ClientId:
             Ref: GoNowCognitoUserPoolClient
           ProviderName:
-            Fn::GetAtt: [ "GoNowCognitoUserPool", "ProviderName" ]
+            Fn::GetAtt: ["GoNowCognitoUserPool", "ProviderName"]
 
   #Apigateway
   #(01) primary API for the Go Now app
