@@ -111,7 +111,7 @@ Resources:
       BucketName: go-now-vehicle-image-bucket
 
   #Bucket policy for GoNowVehicleImageBucket
-  SampleBucketPolicy:
+  GoNowVehicleImageBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket:
@@ -119,35 +119,31 @@ Resources:
       PolicyDocument:
         Statement:
           - Action:
-              - "s3:GetObject"
+              - "s3:*"
             Effect: "Allow"
             Resource:
               Fn::Join:
                 - ""
                 - - "arn:aws:s3:::"
                   - Ref: "GoNowVehicleImageBucket"
-                  - "/*"
-            Principal: "*"
+                  - ""
+            Principal: 
+              AWS: "arn:aws:iam::932203614124:user/gn_img_user"
             Condition:
               StringLike:
-                aws:Referer:
-                  - "http://www.example.com/*"
-                  - "http://example.com/*"
+                s3:prefix: "${cognito-identity.amazonaws.com}/*"
+          #
           - Action:
-              - "s3:GetObject"
+              - "s3:*"
             Effect: "Allow"
             Resource:
               Fn::Join:
                 - ""
                 - - "arn:aws:s3:::"
                   - Ref: "GoNowVehicleImageBucket"
-                  - "/*"
-            Principal: "*"
-            Condition:
-              StringLike:
-                aws:Referer:
-                  - "http://www.example.com/*"
-                  - "http://example.com/*"
+                  - "/${cognito-identity.amazonaws.com}/*"
+            Principal: 
+              AWS: "arn:aws:iam::932203614124:user/gn_img_user"
 
   #DynamoDB Tables
   #(01) configure primary dynamodb table
