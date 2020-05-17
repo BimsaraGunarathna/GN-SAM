@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Simple CRUD webservice. State is stored in a SimpleTable (DynamoDB) resource.
+
 Resources:
-  
   #(01) get vehicle from gn-vehicle-table for unauthenticated users.
   GoNowGetPublicVehicleList:
     Type: AWS::Serverless::Function
@@ -14,10 +14,10 @@ Resources:
         GetResource:
           Type: Api
           Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /resource/{resourceId}
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/public/vehicles
             Method: get
-  
+
   #(02) delete vehicle from gn-vehicle-table
   GoNowDeleteVehicle:
     Type: AWS::Serverless::Function
@@ -25,6 +25,13 @@ Resources:
       Handler: app.goNowDeleteVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-delete-vehicle/
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles/{vehicleId}
+            Method: delete
 
   #(03) get vehicle from gn-vehicle-table for authenticated users.
   GoNowGetPrivateVehicleList:
@@ -33,7 +40,14 @@ Resources:
       Handler: app.goNowGetPrivateVehicleList
       Runtime: nodejs12.x
       CodeUri: go-now-get-private-vehicle-list/
-  
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles
+            Method: get
+
   #(04) change vehicle details of hosted vehicle.
   GoNowPatchVehicle:
     Type: AWS::Serverless::Function
@@ -41,6 +55,13 @@ Resources:
       Handler: app.goNowPatchVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-patch-vehicle/
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles/{vehicleId}
+            Method: patch
 
   #(05) create vehicle profile in the gn-vehicle-table
   GoNowHostVehicle:
@@ -50,13 +71,14 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-host-vehicle/
       Events:
-        PutResource:
+        GetResource:
           Type: Api
           Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /resource/{resourceId}
-            Method: put
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles
+            Method: post
 
+  #(06) Create an entry for image triggered by GoNowVehicleImageBucket
   GoNowVehicleImageTrigger:
     Type: AWS::Serverless::Function
     Properties:
@@ -70,7 +92,7 @@ Resources:
           Properties:
             Bucket: !Ref GoNowVehicleImageBucket
             Events: s3:ObjectCreated:*
-  
+
   #S3
   #(01) create a S3 bucket for storing images of go now app.
   GoNowVehicleImageBucket:
@@ -79,31 +101,26 @@ Resources:
       #AccessControl: PublicRead
       BucketName: go-now-vehicle-image-bucket
 
-
   #DynamoDB Tables
   #(01) configure primary dynamodb table
-  GoNowVehicleTable: 
+  GoNowVehicleTable:
     Type: AWS::DynamoDB::Table
-    Properties: 
-      AttributeDefinitions: 
-        - 
-          AttributeName: "vehicleId"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "vehicleId"
           AttributeType: "S"
-        - 
-          AttributeName: "hostId"
+        - AttributeName: "hostId"
           AttributeType: "S"
-      KeySchema: 
-        - 
-          AttributeName: "vehicleId"
+      KeySchema:
+        - AttributeName: "vehicleId"
           KeyType: "HASH"
-        - 
-          AttributeName: "hostId"
+        - AttributeName: "hostId"
           KeyType: "RANGE"
-      ProvisionedThroughput: 
+      ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "gn-vehicle-table"
-  
+
   #Cognito
   #(01) Cognito user pool configuaration
   GoNowCognitoUserPool:
@@ -119,7 +136,7 @@ Resources:
         - AttributeDataType: String
           Name: email
           Required: false
-  
+
   #Client for Cognito user pool
   GoNowCognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -128,13 +145,22 @@ Resources:
       ClientName: GoNowCognitoUserPoolClient
       GenerateSecret: false
 
-  #Apigateway 
-  #
-  ApiGatewayApi:
+  #Identity Pool
+  GoNowIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId:
+            Ref: GoNowCognitoUserPoolClient
+          ProviderName:
+            Fn::GetAtt: [ "GoNowCognitoUserPool", "ProviderName" ]
+
+  #Apigateway
+  #(01) primary API for the Go Now app
+  GoNowAPI:
     Type: AWS::Serverless::Api
     Properties:
       Name: GoNowAPI
       StageName: devStage
       Cors: "'*'"
-      
-
