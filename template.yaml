@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Simple CRUD webservice. State is stored in a SimpleTable (DynamoDB) resource.
+Resources:
+  
+  #(01) get vehicle from gn-vehicle-table for unauthenticated users.
+  GoNowGetPublicVehicleList:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowGetPublicVehicleList
+      Runtime: nodejs12.x
+      CodeUri: go-now-get-public-vehicle-list/
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            Path: /resource/{resourceId}
+            Method: get
+  
+  #(02) delete vehicle from gn-vehicle-table
+  GoNowDeleteVehicle:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowDeleteVehicle
+      Runtime: nodejs12.x
+      CodeUri: go-now-delete-vehicle/
+
+  #(03) get vehicle from gn-vehicle-table for authenticated users.
+  GoNowGetPrivateVehicleList:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowGetPrivateVehicleList
+      Runtime: nodejs12.x
+      CodeUri: go-now-get-private-vehicle-list/
+  
+  #(04) change vehicle details of hosted vehicle.
+  GoNowPatchVehicle:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowPatchVehicle
+      Runtime: nodejs12.x
+      CodeUri: go-now-patch-vehicle/
+
+  #(05) create vehicle profile in the gn-vehicle-table
+  GoNowHostVehicle:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowHostVehicle
+      Runtime: nodejs12.x
+      CodeUri: go-now-host-vehicle/
+      Events:
+        PutResource:
+          Type: Api
+          Properties:
+            Path: /resource/{resourceId}
+            Method: put
+
+  GoNowVehicleImageTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowVehicleImageTrigger
+      Runtime: nodejs12.x
+      CodeUri: go-now-vehicle-image-trigger/
+      Policies: AmazonS3ReadOnlyAccess
+      Events:
+        PhotoUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref GoNowVehicleImageBucket
+            Events: s3:ObjectCreated:*
+  
+  GoNowVehicleImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      BucketName: go-now-vehicle-image-bucket
+
+      
+  #DynamoDB Tables
+  #(01) configure primary dynamodb table
+  GoNowVehicleTable: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - 
+          AttributeName: "vehicleId"
+          AttributeType: "S"
+        - 
+          AttributeName: "hostId"
+          AttributeType: "S"
+      KeySchema: 
+        - 
+          AttributeName: "vehicleId"
+          KeyType: "HASH"
+        - 
+          AttributeName: "hostId"
+          KeyType: "RANGE"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "gn-vehicle-table"
+
+Outputs:
+  ApiURL:
+    Description: "API endpoint URL for Prod environment."
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resource/"
