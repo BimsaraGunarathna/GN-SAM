@@ -14,6 +14,7 @@ Resources:
         GetResource:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGatewayApi
             Path: /resource/{resourceId}
             Method: get
   
@@ -52,6 +53,7 @@ Resources:
         PutResource:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGatewayApi
             Path: /resource/{resourceId}
             Method: put
 
@@ -69,13 +71,15 @@ Resources:
             Bucket: !Ref GoNowVehicleImageBucket
             Events: s3:ObjectCreated:*
   
+  #S3
+  #(01) create a S3 bucket for storing images of go now app.
   GoNowVehicleImageBucket:
     Type: AWS::S3::Bucket
     Properties:
-      AccessControl: PublicRead
+      #AccessControl: PublicRead
       BucketName: go-now-vehicle-image-bucket
 
-      
+
   #DynamoDB Tables
   #(01) configure primary dynamodb table
   GoNowVehicleTable: 
@@ -99,8 +103,38 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "gn-vehicle-table"
+  
+  #Cognito
+  #(01) Cognito user pool configuaration
+  GoNowCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: GoNowCognitoUserPool
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+  
+  #Client for Cognito user pool
+  GoNowCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref GoNowCognitoUserPool
+      ClientName: GoNowCognitoUserPoolClient
+      GenerateSecret: false
 
-Outputs:
-  ApiURL:
-    Description: "API endpoint URL for Prod environment."
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resource/"
+  #Apigateway 
+  #
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: GoNowAPI
+      StageName: devStage
+      Cors: "'*'"
+      
+
