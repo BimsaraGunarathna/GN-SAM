@@ -92,7 +92,8 @@ Resources:
           Properties:
             Bucket: !Ref GoNowVehicleImageBucket
             Events: s3:ObjectCreated:*
-
+  #
+  #
   #IAM::User
   #IAM User for the GoNowVehicleImageBucket
   MyUser:
@@ -102,6 +103,8 @@ Resources:
         Password: MYNEW1209PASSWORD
       UserName: GoNowImageManagementUser
 
+  #
+  #
   #s3
   #(01) create a S3 bucket for storing images of go now app.
   GoNowVehicleImageBucket:
@@ -127,7 +130,7 @@ Resources:
                 - - "arn:aws:s3:::"
                   - Ref: "GoNowVehicleImageBucket"
                   - ""
-            Principal: 
+            Principal:
               AWS: "arn:aws:iam::932203614124:user/gn_img_user"
             Condition:
               StringLike:
@@ -142,9 +145,11 @@ Resources:
                 - - "arn:aws:s3:::"
                   - Ref: "GoNowVehicleImageBucket"
                   - "/${cognito-identity.amazonaws.com}/*"
-            Principal: 
+            Principal:
               AWS: "arn:aws:iam::932203614124:user/gn_img_user"
 
+  #
+  #
   #DynamoDB Tables
   #(01) configure primary dynamodb table
   GoNowVehicleTable:
@@ -165,6 +170,8 @@ Resources:
         WriteCapacityUnits: "5"
       TableName: "gn-vehicle-table"
 
+  #
+  #
   #Cognito
   #(01) Cognito user pool configuaration
   GoNowCognitoUserPool:
@@ -199,7 +206,9 @@ Resources:
             Ref: GoNowCognitoUserPoolClient
           ProviderName:
             Fn::GetAtt: ["GoNowCognitoUserPool", "ProviderName"]
-
+            
+  #
+  #
   #Apigateway
   #(01) primary API for the Go Now app
   GoNowAPI:
