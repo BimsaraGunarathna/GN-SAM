@@ -14,24 +14,28 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
+const AWS = require('aws-sdk');
+const dynamodb = new AWS.DynamoDB({region: 'ap-south-1', apiVersion: '2012-08-10'});
 
-exports.goNowDeleteVehicle = async (event, context) => {
-    console.log('Bimsara is typing.')
-    console.log('RETURNS vehicles');
-    console.log('RETURNS vehicles');
-    try {
-        // const ret = await axios(url);
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'hello world',
-                // location: ret.data.trim()
-            })
+exports.goNowDeleteVehicle = async (event, context, callback) => {
+    const params = {
+        Key: {
+            "vehicleId": {
+                S: event.vehicleId
+            }
+        },
+        TableName: "gn-vehicle"
+    };
+
+    dynamodb.deleteItem(params, function (err, data) {
+        if (err) {
+            console.log(err, err.stack);
+            callback(err);
         }
-    } catch (err) {
-        console.log(err);
-        return err;
-    }
+        else {
+            console.log(data);
+            callback(null, data);
+        }
 
-    return response
+    });
 };

@@ -14,7 +14,7 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-exports.goNowPatchVehicle = async (event, context) => {
+exports.goNowPatchVehicle = async (event, context, callback) => {
     
     console.log('Go singapore');
     console.log('test');

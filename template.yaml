@@ -3,7 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 Description: Simple CRUD webservice. State is stored in a SimpleTable (DynamoDB) resource.
 
 Resources:
-  
   #
   #
   #(01) get vehicle from gn-vehicle-table for unauthenticated users.
@@ -13,6 +12,10 @@ Resources:
       Handler: app.goNowGetPublicVehicleList
       Runtime: nodejs12.x
       CodeUri: go-now-get-public-vehicle-list/
+      Policies: AmazonS3ReadOnlyAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
       Events:
         GetResource:
           Type: Api
@@ -28,6 +31,12 @@ Resources:
       Handler: app.goNowDeleteVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-delete-vehicle/
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
       Events:
         GetResource:
           Type: Api
@@ -43,6 +52,10 @@ Resources:
       Handler: app.goNowGetPrivateVehicleList
       Runtime: nodejs12.x
       CodeUri: go-now-get-private-vehicle-list/
+      Policies: AmazonS3ReadOnlyAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
       Events:
         GetResource:
           Type: Api
@@ -58,6 +71,12 @@ Resources:
       Handler: app.goNowPatchVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-patch-vehicle/
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
       Events:
         GetResource:
           Type: Api
@@ -73,6 +92,12 @@ Resources:
       Handler: app.goNowHostVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-host-vehicle/
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
       Events:
         GetResource:
           Type: Api
@@ -89,12 +114,16 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-vehicle-image-trigger/
       Policies: AmazonS3ReadOnlyAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
       Events:
         PhotoUpload:
           Type: S3
           Properties:
             Bucket: !Ref GoNowVehicleImageBucket
             Events: s3:ObjectCreated:*
+
   #
   #
   #IAM::User
@@ -106,6 +135,73 @@ Resources:
         Password: MYNEW1209PASSWORD
       UserName: GoNowImageManagementUser
 
+  #
+  #
+  #IAM:Role
+  #under development
+  RootRole: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
+  RolePolicies: 
+    Type: "AWS::IAM::Policy"
+    Properties: 
+      PolicyName: "root"
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Action: "*"
+            Resource: "*"
+      Roles: 
+        - 
+          Ref: "RootRole"
+  RootInstanceProfile: 
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      Path: "/"
+      Roles: 
+        - 
+          Ref: "RootRole"
+
+  #
+  #
+  #IAM::Policy
+  GoNowBasicDynamodbReadWritePolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: GoNowBasicDynamodbReadWritePolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - "dynamodb:BatchGetItem"
+              - "dynamodb:BatchWriteItem"
+              - "dynamodb:ConditionCheckItem"
+              - "dynamodb:DescribeStream"
+              - "dynamodb:DescribeTable"
+              - "dynamodb:GetItem"
+              - "dynamodb:GetRecords"
+              - "dynamodb:GetShardIterator"
+              - "dynamodb:PutItem"
+              - "dynamodb:Query"
+              - "dynamodb:Scan"
+              - "dynamodb:UpdateItem"
+            Resource: "arn:aws:dynamodb:ap-southeast-1:932203614124:table/gn-vehicle-table"
+      Users: 
+        - "GoNowImageManagementUser"
   #
   #
   #s3

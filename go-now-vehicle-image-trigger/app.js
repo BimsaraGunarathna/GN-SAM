@@ -14,7 +14,7 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-exports.goNowVehicleImageTrigger = async (event, context) => {
+exports.goNowVehicleImageTrigger = async (event, context, callback) => {
     console.log('Bimsara is typing.')
     console.log('RETURNS vehicles');
     console.log('RETURNS vehicles');
