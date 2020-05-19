@@ -323,70 +323,63 @@ Resources:
       StageName: devStage
       Cors: "'*'"
       Models:
+        #Model for vehicle.
         SingleVehicleModel:
-          $schema: http://json-schema.org/draft-04/schema#
-          title: SingleVehicleModel
           type: object
-          required:
-            - vehicleId
-            - hostId
           properties:
-            - vehicleId:
-                type: string
-              hostId:
-                type: string
-              hostName:
-                type: string
-              hostPhoneNumber:
-                type: string
-              vehicleName:
-                type: string
-              vehicleType:
-                type: string
-              vehicleNumOfSeats:
-                type: integer
-              vehicleKmPerL:
-                type: number
-              vehicleDayPrice:
-                type: number
-              vehiclePickupLocation:
-                type: string
-              vehicleReturnLocation:
-                type: string
-              vehicleAvaliableStartDate:
-                type: string
-              vehicleAvaliableEndDate:
-                type: string
-              vehicleDescription:
-                type: string
-              vehicleRegNumber:
-                type: string
-              isVehicleFavourite:
-                type: boolean
-              vehicleTag1:
-                type: string
-              vehicleTag2:
-                type: string
-              vehicleTag3:
-                type: string
-              vehicleProfileImageUrl:
-                type: string
-              vehicleImageUrl1:
-                type: string
-              vehicleImageUrl2:
-                type: string
-              vehicleImageUrl3:
-                type: string
-              vehicleAvailability:
-                type: boolean
-              vehicleTripId:
-                type: string
-
-        VehicleArray:
+            vehicleId:
+              type: string
+            hostId:
+              type: string
+            hostName:
+              type: string
+            hostPhoneNumber:
+              type: string
+            vehicleName:
+              type: string
+            vehicleType:
+              type: string
+            vehicleNumOfSeats:
+              type: integer
+            vehicleKmPerL:
+              type: number
+            vehicleDayPrice:
+              type: number
+            vehiclePickupLocation:
+              type: string
+            vehicleReturnLocation:
+              type: string
+            vehicleAvaliableStartDate:
+              type: string
+            vehicleAvaliableEndDate:
+              type: string
+            vehicleDescription:
+              type: string
+            vehicleRegNumber:
+              type: string
+            isVehicleFavourite:
+              type: boolean
+            vehicleTag1:
+              type: string
+            vehicleTag2:
+              type: string
+            vehicleTag3:
+              type: string
+            vehicleProfileImageUrl:
+              type: string
+            vehicleImageUrl1:
+              type: string
+            vehicleImageUrl2:
+              type: string
+            vehicleImageUrl3:
+              type: string
+            vehicleAvailability:
+              type: boolean
+            vehicleTripId:
+              type: string
+        #Array for vehicle.
+        VehicleListAray:
           type: array
-          required:
-            - vehicleId
-            - hostId
           properties:
             vehicleId:
               type: string
