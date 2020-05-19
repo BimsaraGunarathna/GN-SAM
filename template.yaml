@@ -12,7 +12,7 @@ Resources:
       Handler: app.goNowGetPublicVehicleList
       Runtime: nodejs12.x
       CodeUri: go-now-get-public-vehicle-list/
-      Policies: AmazonS3ReadOnlyAccess
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
       Environment:
         Variables:
           TABLE_NAME: !Ref GoNowVehicleTable
@@ -31,6 +31,7 @@ Resources:
       Handler: app.goNowDeleteVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-delete-vehicle/
+      Role: !GetAtt GoNowBasicDeleteLambdaRole.Arn
       Policies:
         # Give DynamoDB Full Access to your Lambda Function
         - AmazonDynamoDBFullAccess
@@ -53,6 +54,7 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-get-private-vehicle-list/
       Policies: AmazonS3ReadOnlyAccess
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
       Environment:
         Variables:
           TABLE_NAME: !Ref GoNowVehicleTable
@@ -71,6 +73,7 @@ Resources:
       Handler: app.goNowPatchVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-patch-vehicle/
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
       Policies:
         # Give DynamoDB Full Access to your Lambda Function
         - AmazonDynamoDBFullAccess
@@ -92,6 +95,7 @@ Resources:
       Handler: app.goNowHostVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-host-vehicle/
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
       Policies:
         # Give DynamoDB Full Access to your Lambda Function
         - AmazonDynamoDBFullAccess
@@ -114,6 +118,7 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-vehicle-image-trigger/
       Policies: AmazonS3ReadOnlyAccess
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
       Environment:
         Variables:
           TABLE_NAME: !Ref GoNowVehicleTable
@@ -138,70 +143,71 @@ Resources:
   #
   #
   #IAM:Role
-  #under development
-  RootRole: 
+  #grant read and write GoNowVehicleTable dynamodb table for lambda.
+  GoNowBasicReadWriteLambdaRole:
     Type: "AWS::IAM::Role"
-    Properties: 
-      AssumeRolePolicyDocument: 
+    Properties:
+      AssumeRolePolicyDocument:
         Version: "2012-10-17"
-        Statement: 
-          - 
-            Effect: "Allow"
-            Principal: 
-              Service: 
-                - "ec2.amazonaws.com"
-            Action: 
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
               - "sts:AssumeRole"
       Path: "/"
-  RolePolicies: 
-    Type: "AWS::IAM::Policy"
-    Properties: 
-      PolicyName: "root"
-      PolicyDocument: 
-        Version: "2012-10-17"
-        Statement: 
-          - 
-            Effect: "Allow"
-            Action: "*"
-            Resource: "*"
-      Roles: 
-        - 
-          Ref: "RootRole"
-  RootInstanceProfile: 
-    Type: "AWS::IAM::InstanceProfile"
-    Properties: 
-      Path: "/"
-      Roles: 
-        - 
-          Ref: "RootRole"
+      Policies:
+        - PolicyName: "GoNowBasicReadWriteDynamodbPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "dynamodb:BatchGetItem"
+                  - "dynamodb:BatchWriteItem"
+                  - "dynamodb:ConditionCheckItem"
+                  - "dynamodb:DescribeStream"
+                  - "dynamodb:DescribeTable"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:GetRecords"
+                  - "dynamodb:GetShardIterator"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:UpdateItem"
+                Resource: !GetAtt GoNowVehicleTable.Arn
+  #                Fn::Join:
+  #                  - ""
+  #                  - - "arn:aws:dynamodb:"
+  #                    - Ref: "GoNowVehicleTable"
+  #                    - ""
 
-  #
-  #
-  #IAM::Policy
-  GoNowBasicDynamodbReadWritePolicy:
-    Type: "AWS::IAM::Policy"
+  #grant read and delete GoNowVehicleTable dynamodb table item for lambda.
+  GoNowBasicDeleteLambdaRole:
+    Type: "AWS::IAM::Role"
     Properties:
-      PolicyName: GoNowBasicDynamodbReadWritePolicy
-      PolicyDocument:
-        Version: 2012-10-17
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
         Statement:
-          - Effect: Allow
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
             Action:
-              - "dynamodb:BatchGetItem"
-              - "dynamodb:BatchWriteItem"
-              - "dynamodb:ConditionCheckItem"
-              - "dynamodb:DescribeStream"
-              - "dynamodb:DescribeTable"
-              - "dynamodb:GetItem"
-              - "dynamodb:GetRecords"
-              - "dynamodb:GetShardIterator"
-              - "dynamodb:PutItem"
-              - "dynamodb:Query"
-              - "dynamodb:Scan"
-              - "dynamodb:UpdateItem"
-            Resource: "arn:aws:dynamodb:ap-southeast-1:932203614124:table/gn-vehicle-table"
-      Users: 
-        - "GoNowImageManagementUser"
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "GoNowBasicDeleteDynamodbPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:GetItem"
+                Resource: !GetAtt GoNowVehicleTable.Arn
+
   #
   #
   #s3
@@ -316,3 +322,119 @@ Resources:
       Name: GoNowAPI
       StageName: devStage
       Cors: "'*'"
+      Models:
+        SingleVehicleModel:
+          $schema: http://json-schema.org/draft-04/schema#
+          title: SingleVehicleModel
+          type: object
+          required:
+            - vehicleId
+            - hostId
+          properties:
+            - vehicleId:
+                type: string
+              hostId:
+                type: string
+              hostName:
+                type: string
+              hostPhoneNumber:
+                type: string
+              vehicleName:
+                type: string
+              vehicleType:
+                type: string
+              vehicleNumOfSeats:
+                type: integer
+              vehicleKmPerL:
+                type: number
+              vehicleDayPrice:
+                type: number
+              vehiclePickupLocation:
+                type: string
+              vehicleReturnLocation:
+                type: string
+              vehicleAvaliableStartDate:
+                type: string
+              vehicleAvaliableEndDate:
+                type: string
+              vehicleDescription:
+                type: string
+              vehicleRegNumber:
+                type: string
+              isVehicleFavourite:
+                type: boolean
+              vehicleTag1:
+                type: string
+              vehicleTag2:
+                type: string
+              vehicleTag3:
+                type: string
+              vehicleProfileImageUrl:
+                type: string
+              vehicleImageUrl1:
+                type: string
+              vehicleImageUrl2:
+                type: string
+              vehicleImageUrl3:
+                type: string
+              vehicleAvailability:
+                type: boolean
+              vehicleTripId:
+                type: string
+
+        VehicleArray:
+          type: array
+          required:
+            - vehicleId
+            - hostId
+          properties:
+            vehicleId:
+              type: string
+            hostId:
+              type: string
+            hostName:
+              type: string
+            hostPhoneNumber:
+              type: string
+            vehicleName:
+              type: string
+            vehicleType:
+              type: string
+            vehicleNumOfSeats:
+              type: integer
+            vehicleKmPerL:
+              type: number
+            vehicleDayPrice:
+              type: number
+            vehiclePickupLocation:
+              type: string
+            vehicleReturnLocation:
+              type: string
+            vehicleAvaliableStartDate:
+              type: string
+            vehicleAvaliableEndDate:
+              type: string
+            vehicleDescription:
+              type: string
+            vehicleRegNumber:
+              type: string
+            isVehicleFavourite:
+              type: boolean
+            vehicleTag1:
+              type: string
+            vehicleTag2:
+              type: string
+            vehicleTag3:
+              type: string
+            vehicleProfileImageUrl:
+              type: string
+            vehicleImageUrl1:
+              type: string
+            vehicleImageUrl2:
+              type: string
+            vehicleImageUrl3:
+              type: string
+            vehicleAvailability:
+              type: boolean
+            vehicleTripId:
+              type: string
