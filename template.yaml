@@ -2,6 +2,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Simple CRUD webservice. State is stored in a SimpleTable (DynamoDB) resource.
 
+Outputs:
+
+  GoNowAPIUrl:
+    Value: !Sub "https://${GoNowAPI}.execute-api.${AWS::Region}.amazonaws.com/${!GetAtt GoNowAPI.StageName}/"
+
 Resources:
   #
   #
@@ -23,6 +28,9 @@ Resources:
             RestApiId: !Ref GoNowAPI
             Path: /v1.0.0/public/vehicles
             Method: get
+            RequestModel:
+              Model: "SingleVehicleModel"
+              Required: true
 
   #(02) delete vehicle from gn-vehicle-table
   GoNowDeleteVehicle:
@@ -274,7 +282,7 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "gn-vehicle-table"
-
+  
   #
   #
   #Cognito
@@ -322,6 +330,37 @@ Resources:
       Name: GoNowAPI
       StageName: devStage
       Cors: "'*'"
+      DefinitionBody:
+            swagger: 2.0
+            info:
+              title:
+                Ref: AWS::StackName
+            paths:
+              "/get":
+                get:
+                  x-amazon-apigateway-integration:
+                    httpMethod: POST
+                    type: aws
+                    uri:
+                      Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GoNowDeleteVehicle.Arn}/invocations
+                  responses: {}
+      GatewayResponses:
+        MISSING_AUTHENTICATION_TOKEN:
+          StatusCode: 405
+          ResponseTemplates:
+            "application/json": '{ "message": "Method Not Allowed" }'
+      Auth:
+        Authorizers:
+          GoNowCognitoAPIAuthorizer:
+            UserPoolArn:
+              Fn::GetAtt:
+                - GoNowCognitoUserPool
+                - Arn
+            AuthType: "COGNITO_USER_POOLS"
+        DefaultAuthorizer: GoNowCognitoAPIAuthorizer
+        InvokeRole: CALLER_CREDENTIALS
+        AddDefaultAuthorizerToCorsPreflight: false
+        ApiKeyRequired: false
       Models:
         #Model for vehicle.
         SingleVehicleModel:
@@ -377,6 +416,7 @@ Resources:
               type: boolean
             vehicleTripId:
               type: string
+
         #Array for vehicle.
         VehicleListAray:
           type: array
@@ -431,3 +471,14 @@ Resources:
               type: boolean
             vehicleTripId:
               type: string
+  
+  ################################
+  apiGateway:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "my-api"
+      Description: "My API"
+  
+
+
+
