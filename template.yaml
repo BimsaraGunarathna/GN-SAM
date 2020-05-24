@@ -3,9 +3,48 @@ Transform: AWS::Serverless-2016-10-31
 Description: Simple CRUD webservice. State is stored in a SimpleTable (DynamoDB) resource.
 
 Outputs:
-
   GoNowAPIUrl:
     Value: !Sub "https://${GoNowAPI}.execute-api.${AWS::Region}.amazonaws.com/${!GetAtt GoNowAPI.StageName}/"
+
+  ConnectionsTableArn:
+    Description: "Connections table ARN"
+    Value: !GetAtt ConnectionsTable.Arn
+
+  GoNowChatOnConnectArn:
+    Description: "OnConnect function ARN"
+    Value: !GetAtt GoNowChatOnConnect.Arn
+
+  GoNowChatOnDisconnectArn:
+    Description: "OnDisconnect function ARN"
+    Value: !GetAtt GoNowChatOnDisconnect.Arn
+
+  GoNowChatSendMessageArn:
+    Description: "SendMessage function ARN"
+    Value: !GetAtt GoNowChatSendMessage.Arn
+
+  WebSocketURI:
+    Description: "The WSS Protocol URI to connect to"
+    Value: !Join [ '', [ 'wss://', !Ref SimpleChatWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+
+Parameters:
+  EnvironmentParameter:
+    Type: String
+    Default: devStage
+    AllowedValues:
+      - devStage
+      - prodStage
+    Description: devStage, prodStage
+
+  #for GoNowChat feature
+  TableName:
+    Type: String
+    Default: 'GoNowChatTable'
+    Description: (Required) The name of the new DynamoDB to store connection identifiers for each connected clients. Minimum 3 characters
+    MinLength: 3
+    MaxLength: 50
+    AllowedPattern: ^[A-Za-z_]+$
+    ConstraintDescription: 'Required. Can be characters and underscore only. No numbers or special characters allowed.'
+
 
 Resources:
   #
@@ -282,7 +321,7 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "gn-vehicle-table"
-  
+
   #
   #
   #Cognito
@@ -328,22 +367,14 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: GoNowAPI
-      StageName: devStage
+      StageName: !Ref EnvironmentParameter
       Cors: "'*'"
       DefinitionBody:
-            swagger: 2.0
-            info:
-              title:
-                Ref: AWS::StackName
-            paths:
-              "/get":
-                get:
-                  x-amazon-apigateway-integration:
-                    httpMethod: POST
-                    type: aws
-                    uri:
-                      Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GoNowDeleteVehicle.Arn}/invocations
-                  responses: {}
+        "Fn::Transform":
+          Name: "AWS::Include"
+          # Replace <bucket> with your bucket name
+          Parameters:
+            Location: !Join ["", ["s3://gn-s3-repo", "/GoNowAPI/GoNowAPI.yaml"]]
       GatewayResponses:
         MISSING_AUTHENTICATION_TOKEN:
           StatusCode: 405
@@ -471,14 +502,183 @@ Resources:
               type: boolean
             vehicleTripId:
               type: string
-  
-  ################################
-  apiGateway:
-    Type: "AWS::ApiGateway::RestApi"
+
+  #Resources for GoNowChat feature
+  #GoNowAPI
+  SimpleChatWebSocket:
+    Type: AWS::ApiGatewayV2::Api
     Properties:
-      Name: "my-api"
-      Description: "My API"
-  
+      Name: GoNowChatAPI
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.message"
 
-
-
+  #(Route 01)
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      RouteKey: $connect
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref ConnectInteg
+  ConnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      Description: Connect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GoNowChatOnConnect.Arn}/invocations
+      
+  #(Route 02)
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      OperationName: DisconnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref DisconnectInteg
+  DisconnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      Description: Disconnect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GoNowChatOnDisconnect.Arn}/invocations
+      
+  #(Route 03)
+  SendRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      RouteKey: sendmessage
+      AuthorizationType: NONE
+      OperationName: SendRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref SendInteg
+  SendInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      Description: Send Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GoNowChatSendMessage.Arn}/invocations
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+    - ConnectRoute
+    - SendRoute
+    - DisconnectRoute
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: Prod
+      Description: Prod Stage
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref SimpleChatWebSocket
+  ConnectionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: "connectionId"
+        AttributeType: "S"
+      KeySchema:
+      - AttributeName: "connectionId"
+        KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled: True
+      TableName: !Ref TableName
+      
+  #(GoNowChat Function 01)
+  GoNowChatOnConnect:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: onconnect/
+      Handler: app.handler
+      MemorySize: 256
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref TableName
+  OnConnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SimpleChatWebSocket
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GoNowChatOnConnect
+      Principal: apigateway.amazonaws.com
+      
+  #(GoNowChat Function 02)
+  GoNowChatOnDisconnect:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ondisconnect/
+      Handler: app.handler
+      MemorySize: 256
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref TableName
+  OnDisconnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SimpleChatWebSocket
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GoNowChatOnDisconnect
+      Principal: apigateway.amazonaws.com
+      
+  #(GoNowChat Function 03)
+  GoNowChatSendMessage:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sendmessage/
+      Handler: app.handler
+      MemorySize: 256
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref TableName
+      - Statement:
+        - Effect: Allow
+          Action:
+          - 'execute-api:ManageConnections'
+          Resource:
+          - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatWebSocket}/*'
+  SendMessagePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SimpleChatWebSocket
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GoNowChatSendMessage
+      Principal: apigateway.amazonaws.com
