@@ -613,7 +613,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: onconnect/
-      Handler: app.handler
+      Handler: app.onConnect
       MemorySize: 256
       Runtime: nodejs12.x
       Environment:
@@ -636,7 +636,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ondisconnect/
-      Handler: app.handler
+      Handler: app.onDisconnect
       MemorySize: 256
       Runtime: nodejs12.x
       Environment:
@@ -659,7 +659,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: sendmessage/
-      Handler: app.handler
+      Handler: app.sendMessage
       MemorySize: 256
       Runtime: nodejs12.x
       Environment:

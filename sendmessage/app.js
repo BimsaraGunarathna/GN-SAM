@@ -7,7 +7,14 @@ const ddb = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10', region: 
 
 const { TABLE_NAME } = process.env;
 
-exports.handler = async event => {
+exports.sendMessage = async event => {
+
+  //get webscoket conncetion id.
+  const connectionId = event.requestContext.connectionId;
+  //get the user id of the new connection holder.
+  const userId = event.requestContext.userId;
+  //get the body from the request.
+  
   
   console.log('- Event of the sendmessage -');
   console.log(event);
