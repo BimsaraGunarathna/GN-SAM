@@ -10,7 +10,7 @@ exports.onConnect = async event => {
   //get webscoket conncetion id.
   const connectionId = event.requestContext.connectionId;
   //get the user id of the new connection holder.
-  const userId = event.requestContext.userId;
+  const userId = event.queryStringParameters.userId;
 
   const putParams = {
     TableName: process.env.TABLE_NAME,

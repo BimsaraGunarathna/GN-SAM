@@ -7,15 +7,29 @@ const ddb = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10', region: 
 
 const { TABLE_NAME } = process.env;
 
+var moment = require("moment-timezone");
+
 exports.sendMessage = async event => {
 
   //get webscoket conncetion id.
   const connectionId = event.requestContext.connectionId;
   //get the user id of the new connection holder.
-  const userId = event.requestContext.userId;
-  //get the body from the request.
-  
-  
+  const userId = event.queryStringParameters.userId;
+  //get the request body
+  const body = JSON.parse(event.body);
+
+  //Message text.
+  const msg = body.message;
+  //ReceiverId
+  const receiverId = body.receiverId;
+
+  //get the current time
+  var date = new Date();
+  var mom = moment(date.getTime()).tz("Asia/Colombo").format("DD-MM-YYYY, H:mm:ss a");
+
+  var date1 = Date.now();
+  callback(null, mom + '   ' + date1 + '   ' + date1);
+
   console.log('- Event of the sendmessage -');
   console.log(event);
 
