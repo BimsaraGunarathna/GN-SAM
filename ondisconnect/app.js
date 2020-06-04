@@ -12,17 +12,43 @@ const AWS = require('aws-sdk');
 const ddb = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10', region: process.env.AWS_REGION });
 
 exports.onDisconnect = async event => {
-  const deleteParams = {
+  //get the user id of the new connection holder.
+  const connectionId = event.requestContext.connectionId;
+
+  //for query
+  const paramsForQueryConnection = {
+    TableName: "GoNowChatTable",
+    //KeyConditionExpression: '#pk = :pk',
+    KeyConditionExpression: '#pk = :pk AND begins_with(#sk, :sk)',
+    ExpressionAttributeNames: {
+      '#pk': "PK",
+      '#sk': "SK"
+    },
+    ExpressionAttributeValues: {
+      ":pk": "CONNECTION#NmMRKdJNSQ0AbGQ=",
+      ":sk": "CONNECTION#"
+    },
+    ProjectionExpression: 'PK, SK' 
+  }
+  
+  //get the primary key for the CONNECTION record.
+  try {
+    var primaryKeyForConnection = await (ddb.query(paramsForQueryConnection).promise()).Items[0];
+  } catch (err) {
+    return { statusCode: 500, body: 'Failed to query for disconnect: ' + JSON.stringify(err) };
+  }
+
+  //for delete
+  const paramsForDeleteConnection = {
     TableName: process.env.TABLE_NAME,
-    Key: {
-      connectionId: event.requestContext.connectionId
-    }
+    Key: primaryKeyForConnection
   };
 
+  //delete the retrieved CONNECTION record.
   try {
-    await ddb.delete(deleteParams).promise();
+    await ddb.delete(paramsForDeleteConnection).promise();
   } catch (err) {
-    return { statusCode: 500, body: 'Failed to disconnect: ' + JSON.stringify(err) };
+    return { statusCode: 500, body: 'Failed to delete for disconnect: ' + JSON.stringify(err) };
   }
 
   return { statusCode: 200, body: 'Disconnected.' };

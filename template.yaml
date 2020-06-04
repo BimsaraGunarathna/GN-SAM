@@ -596,18 +596,37 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
+      - AttributeName: "PK"
+        AttributeType: "S"
+      - AttributeName: "SK"
+        AttributeType: "S"
+      - AttributeName: "connectionUserId"
+        AttributeType: "S"
       - AttributeName: "connectionId"
         AttributeType: "S"
       KeySchema:
-      - AttributeName: "connectionId"
+      - AttributeName: "PK"
         KeyType: "HASH"
+      - AttributeName: "SK"
+        KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       SSESpecification:
         SSEEnabled: True
       TableName: !Ref TableName
-      
+      GlobalSecondaryIndexes:
+      - IndexName: "GSI_1"
+        KeySchema:
+          - AttributeName: "connectionUserId"
+            KeyType: "HASH"
+          - AttributeName: "connectionId"
+            KeyType: "RANGE"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+        ProvisionedThroughput:
+          ReadCapacityUnits: '5'
+          WriteCapacityUnits: '5'
   #(GoNowChat Function 01)
   GoNowChatOnConnect:
     Type: AWS::Serverless::Function
