@@ -25,15 +25,16 @@ exports.onDisconnect = async event => {
       '#sk': "SK"
     },
     ExpressionAttributeValues: {
-      ":pk": "CONNECTION#NmMRKdJNSQ0AbGQ=",
+      ":pk": "CONNECTION#" + connectionId,
       ":sk": "CONNECTION#"
     },
-    ProjectionExpression: 'PK, SK' 
+    ProjectionExpression: 'PK, SK'  
   }
   
   //get the primary key for the CONNECTION record.
   try {
-    var primaryKeyForConnection = await (ddb.query(paramsForQueryConnection).promise()).Items[0];
+    var primaryKeyQueryForConnection = await (ddb.query(paramsForQueryConnection).promise());
+    var primaryKeyForConnection = await primaryKeyQueryForConnection['Items'][0];
   } catch (err) {
     return { statusCode: 500, body: 'Failed to query for disconnect: ' + JSON.stringify(err) };
   }

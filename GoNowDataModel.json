@@ -1,0 +1,1529 @@
+{
+  "ModelName": "GoNowDataModel",
+  "ModelMetadata": {
+    "Author": "BGD",
+    "DateCreated": "May 31, 2020, 04:29 PM",
+    "DateLastModified": "Jun 06, 2020, 09:33 PM",
+    "Description": "Basic model for the GoNow app.",
+    "Version": "1.0"
+  },
+  "DataModel": [
+    {
+      "TableName": "GoNowBaseTable",
+      "KeyAttributes": {
+        "PartitionKey": {
+          "AttributeName": "PK",
+          "AttributeType": "S"
+        },
+        "SortKey": {
+          "AttributeName": "SK",
+          "AttributeType": "S"
+        }
+      },
+      "NonKeyAttributes": [
+        {
+          "AttributeName": "versionNo",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "createdAt",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiAvgRating",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiKmPerL",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiNoOfSeats",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiNoOfDoors",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiAvailableStartDate",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiAvailableEndDate",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiIsAvailable",
+          "AttributeType": "BOOL"
+        },
+        {
+          "AttributeName": "vehiDescription",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiVIN",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "isVehi1981Later",
+          "AttributeType": "BOOL"
+        },
+        {
+          "AttributeName": "vehiTransmission",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiOdometer",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "isVehiPersonal",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMainProfileImage",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiProfileImages",
+          "AttributeType": "SS"
+        },
+        {
+          "AttributeName": "vehiPricingPricePerDay",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiPricingPricePerKM",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiPricingDiscountPresentage",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiLocaProvinceId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiLocaCityId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiLocaDistrictId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiLocaStreetAddre",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiLocaPostalCode",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiLocaLogitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiLocaLattitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiTags",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiInsurance",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiRevenueLicenseVehiDes",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiRevenueLicenseEndDate",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiRevenueLicenseStartDate",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiRevenueLicenseOwnerName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiRevenueLicenseVETCertificationNum",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiRevenueLicenseVETValidEndPeriod",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiRevenueLicenseVETValidStartPeriod",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiRevenueLicenseImageURL",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiOwner",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiOwnerAddress",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiEngineNum",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiVehiClass",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiMake",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiManufacYr",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiRegisteredYr",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiFuelType",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiCRType",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegiBodyType",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiMotorRegImageUrl",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiOrignBodyStyle",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiOrignTrimLvl",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiOrignModelYr",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiOrignCarMake",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiFeature1",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiFeature2",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiFeature3",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiFeature4",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiFeature5",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "vehiFeatures",
+          "AttributeType": "SS"
+        },
+        {
+          "AttributeName": "userId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userEmail",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userFirstName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userSecondName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userLastName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userMobileNo",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userAvgRating",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userNoOfRentedVehi",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userNoOfTrips",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userLicenSurname",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userOtherNames",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userDOB",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userDOIssueOfLicen",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userDOExpiryOfLicen",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userNIC",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userNumOfLicen",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userPermanentAddress",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userProfileImage",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "userWishlist",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostEmail",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostFirstName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostSecondName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostLastName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostMobileNo",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostAvgRating",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostNoOfHostedVehi",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "hostNoOfTrips",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripStartDate",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripEndDate",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripHasExpired",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripStartOdometer",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripEndOdometer",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripHasStartedByHost",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripHasStartedByRentee",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripHasEndedByHost",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripHasEndedByRentee",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripDays",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripDayLocas",
+          "AttributeType": "SS"
+        },
+        {
+          "AttributeName": "tripPickupLocaLongitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripPickupLocaLatitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripReturnLocaLongitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tripReturnLocaLatitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "provinceId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "provinceName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "districtName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "districtId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "cityId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "cityName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "cateId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "cateName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "cateDescription",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "classId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "className",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "classDescription",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "featureId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "featureName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "featureDescription",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "featureVehicles",
+          "AttributeType": "SS"
+        },
+        {
+          "AttributeName": "tagId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tagName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tagDescription",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "tagVehicles",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "insurerId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "insurerName",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "insurerDes",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "insurerVehis",
+          "AttributeType": "SS"
+        },
+        {
+          "AttributeName": "fuelId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "fuelType",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "fuelOctaneLvl",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "fuelDescription",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "msgId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "msgContent",
+          "AttributeType": "SS"
+        },
+        {
+          "AttributeName": "msgConnectionId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "msgSenderId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "msgRecieverId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "msgStatus",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingIsVehiRecommended",
+          "AttributeType": "BOOL"
+        },
+        {
+          "AttributeName": "ratingIsRenteeRecommended",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingIsHostRecommended",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingVehiDesByRentee",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingHostDesByRenttee",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingRenteeDesByHost",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingVehiNoByRentee",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingHostNoByRenttee",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "ratingRenteeNoByHost",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerStartDate",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerEndDate",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerTripDays",
+          "AttributeType": "SS"
+        },
+        {
+          "AttributeName": "offerPickupLocaLongitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerPickupLocaLatitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerReturnLocaLongitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerReturnLocaLatitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerHasExpired",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerAcceptedByHost",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerDays",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "offerDayLocas",
+          "AttributeType": "S"
+        }
+      ],
+      "TableFacets": [
+        {
+          "FacetName": "vehiId-vehiId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "vehiId",
+            "SortKeyAlias": "vehiId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "vehiName",
+            "vehiAvgRating",
+            "vehiKmPerL",
+            "vehiNoOfSeats",
+            "vehiNoOfDoors",
+            "vehiAvailableStartDate",
+            "vehiAvailableEndDate",
+            "vehiIsAvailable",
+            "vehiDescription",
+            "vehiVIN",
+            "isVehi1981Later",
+            "vehiTransmission",
+            "vehiOdometer",
+            "isVehiPersonal",
+            "vehiMainProfileImage",
+            "vehiProfileImages",
+            "vehiPricingPricePerDay",
+            "vehiPricingPricePerKM",
+            "vehiPricingDiscountPresentage",
+            "vehiLocaProvinceId",
+            "vehiLocaCityId",
+            "vehiLocaDistrictId",
+            "vehiLocaStreetAddre",
+            "vehiLocaPostalCode",
+            "vehiLocaLogitude",
+            "vehiLocaLattitude",
+            "vehiTags",
+            "vehiInsurance",
+            "vehiRevenueLicenseVehiDes",
+            "vehiRevenueLicenseEndDate",
+            "vehiRevenueLicenseStartDate",
+            "vehiRevenueLicenseOwnerName",
+            "vehiRevenueLicenseVETCertificationNum",
+            "vehiRevenueLicenseVETValidEndPeriod",
+            "vehiRevenueLicenseVETValidStartPeriod",
+            "vehiRevenueLicenseImageURL",
+            "vehiMotorRegiOwner",
+            "vehiMotorRegiOwnerAddress",
+            "vehiMotorRegiEngineNum",
+            "vehiMotorRegiVehiClass",
+            "vehiMotorRegiMake",
+            "vehiMotorRegiManufacYr",
+            "vehiMotorRegiRegisteredYr",
+            "vehiMotorRegiFuelType",
+            "vehiMotorRegiCRType",
+            "vehiMotorRegiBodyType",
+            "vehiMotorRegImageUrl",
+            "vehiOrignBodyStyle",
+            "vehiOrignTrimLvl",
+            "vehiOrignModelYr",
+            "vehiOrignCarMake",
+            "vehiFeature1",
+            "vehiFeature2",
+            "vehiFeature3",
+            "vehiFeature4",
+            "vehiFeature5",
+            "vehiFeatures"
+          ]
+        },
+        {
+          "FacetName": "userId-userId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "userId",
+            "SortKeyAlias": "userId"
+          },
+          "TableData": [
+            {
+              "PK": {
+                "S": "USER#101"
+              },
+              "SK": {
+                "S": "USER#101"
+              },
+              "createdAt": {
+                "S": "2020-08-14 | 23:30"
+              },
+              "userId": {
+                "S": "101"
+              },
+              "versionNo": {
+                "S": "1"
+              },
+              "userEmail": {
+                "S": "test@test.com"
+              },
+              "userFirstName": {
+                "S": "Bimsara"
+              },
+              "userSecondName": {
+                "S": "Gunarathna"
+              },
+              "userLastName": {
+                "S": "Dolamulla"
+              },
+              "userMobileNo": {
+                "S": "071-2422767"
+              },
+              "userAvgRating": {
+                "S": "12"
+              },
+              "userNoOfRentedVehi": {
+                "S": "1"
+              },
+              "userNoOfTrips": {
+                "S": "1"
+              },
+              "userProfileImage": {
+                "S": "http//test.com"
+              },
+              "hostId": {
+                "S": "101"
+              }
+            }
+          ],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "userId",
+            "userEmail",
+            "userFirstName",
+            "userSecondName",
+            "userLastName",
+            "userMobileNo",
+            "userAvgRating",
+            "userNoOfRentedVehi",
+            "userNoOfTrips",
+            "userLicenSurname",
+            "userOtherNames",
+            "userDOB",
+            "userDOIssueOfLicen",
+            "userDOExpiryOfLicen",
+            "userNIC",
+            "userNumOfLicen",
+            "userPermanentAddress",
+            "userProfileImage",
+            "userWishlist",
+            "hostId"
+          ]
+        },
+        {
+          "FacetName": "vehiId-tripId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "vehiId",
+            "SortKeyAlias": "tripId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "userId",
+            "hostId",
+            "tripId",
+            "tripStartDate",
+            "tripEndDate",
+            "tripHasExpired",
+            "tripStartOdometer",
+            "tripEndOdometer",
+            "tripHasStartedByHost",
+            "tripHasStartedByRentee",
+            "tripHasEndedByHost",
+            "tripHasEndedByRentee",
+            "tripDays",
+            "tripDayLocas",
+            "tripPickupLocaLongitude",
+            "tripPickupLocaLatitude",
+            "tripReturnLocaLongitude",
+            "tripReturnLocaLatitude",
+            "ratingId",
+            "offerId"
+          ]
+        },
+        {
+          "FacetName": "vehiId-vehiTagId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "vehiId",
+            "SortKeyAlias": "vehiTagId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "createdAt",
+            "vehiId",
+            "vehiName",
+            "vehiAvgRating",
+            "vehiKmPerL",
+            "vehiAvailableStartDate",
+            "vehiAvailableEndDate",
+            "vehiIsAvailable",
+            "isVehiPersonal",
+            "vehiMainProfileImage"
+          ]
+        },
+        {
+          "FacetName": "userId-offerId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "userId",
+            "SortKeyAlias": "offerId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "userId",
+            "offerId",
+            "offerStartDate",
+            "offerEndDate",
+            "offerTripDays",
+            "offerPickupLocaLongitude",
+            "offerPickupLocaLatitude",
+            "offerReturnLocaLongitude",
+            "offerReturnLocaLatitude",
+            "offerHasExpired",
+            "offerAcceptedByHost",
+            "offerDays",
+            "offerDayLocas"
+          ]
+        },
+        {
+          "FacetName": "userId-tripId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "userId",
+            "SortKeyAlias": "offerId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "userId",
+            "hostId",
+            "tripId",
+            "tripStartDate",
+            "tripEndDate",
+            "tripHasExpired",
+            "tripStartOdometer",
+            "tripEndOdometer",
+            "tripHasStartedByHost",
+            "tripHasStartedByRentee",
+            "tripHasEndedByHost",
+            "tripHasEndedByRentee",
+            "tripDays",
+            "tripDayLocas",
+            "tripPickupLocaLongitude",
+            "tripPickupLocaLatitude",
+            "tripReturnLocaLongitude",
+            "tripReturnLocaLatitude",
+            "ratingId",
+            "offerId"
+          ]
+        },
+        {
+          "FacetName": "userId-hostId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "userId",
+            "SortKeyAlias": "hostId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "hostId"
+          ]
+        },
+        {
+          "FacetName": "userId-ratingId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "userId",
+            "SortKeyAlias": "ratingId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "userId",
+            "hostId",
+            "ratingId",
+            "ratingIsVehiRecommended",
+            "ratingIsRenteeRecommended",
+            "ratingIsHostRecommended",
+            "ratingVehiDesByRentee",
+            "ratingHostDesByRenttee",
+            "ratingRenteeDesByHost",
+            "ratingVehiNoByRentee",
+            "ratingHostNoByRenttee",
+            "ratingRenteeNoByHost"
+          ]
+        },
+        {
+          "FacetName": "hostId-hostId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "hostId",
+            "SortKeyAlias": "hostId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "userId",
+            "hostId",
+            "hostEmail",
+            "hostFirstName",
+            "hostSecondName",
+            "hostLastName",
+            "hostMobileNo",
+            "hostAvgRating",
+            "hostNoOfHostedVehi",
+            "hostNoOfTrips"
+          ]
+        },
+        {
+          "FacetName": "hostId-vehiId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "hostId",
+            "SortKeyAlias": "vehiId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "vehiName",
+            "vehiAvgRating",
+            "vehiKmPerL",
+            "vehiNoOfSeats",
+            "vehiNoOfDoors",
+            "vehiAvailableStartDate",
+            "vehiAvailableEndDate",
+            "vehiIsAvailable",
+            "vehiDescription",
+            "vehiVIN",
+            "isVehi1981Later",
+            "vehiTransmission",
+            "vehiOdometer",
+            "isVehiPersonal",
+            "vehiMainProfileImage",
+            "vehiProfileImages",
+            "hostId"
+          ]
+        },
+        {
+          "FacetName": "hostId-userId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "hostId",
+            "SortKeyAlias": "userId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "userId",
+            "hostId"
+          ]
+        },
+        {
+          "FacetName": "hostId-ratingId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "hostId",
+            "SortKeyAlias": "ratingId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "userId",
+            "hostId",
+            "tripId",
+            "ratingId",
+            "ratingVehiDesByRentee",
+            "ratingHostDesByRenttee",
+            "ratingRenteeDesByHost",
+            "ratingVehiNoByRentee",
+            "ratingHostNoByRenttee",
+            "ratingRenteeNoByHost"
+          ]
+        },
+        {
+          "FacetName": "hostId-tripId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "hostId",
+            "SortKeyAlias": "tripId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "userId",
+            "hostId",
+            "tripId",
+            "tripStartDate",
+            "tripEndDate",
+            "tripHasExpired",
+            "tripStartOdometer",
+            "tripEndOdometer",
+            "tripHasStartedByHost",
+            "tripHasStartedByRentee",
+            "tripHasEndedByHost",
+            "tripHasEndedByRentee",
+            "tripDays",
+            "tripDayLocas",
+            "ratingId",
+            "offerId"
+          ]
+        },
+        {
+          "FacetName": "hostId-offerId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "hostId",
+            "SortKeyAlias": "offerId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "userId",
+            "hostId",
+            "offerId",
+            "offerStartDate",
+            "offerEndDate",
+            "offerTripDays",
+            "offerPickupLocaLongitude",
+            "offerPickupLocaLatitude",
+            "offerReturnLocaLongitude",
+            "offerReturnLocaLatitude",
+            "offerHasExpired",
+            "offerAcceptedByHost",
+            "offerDays",
+            "offerDayLocas"
+          ]
+        },
+        {
+          "FacetName": "tripId-tripId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "tripId",
+            "SortKeyAlias": "tripId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "userId",
+            "hostId",
+            "tripId",
+            "tripStartDate",
+            "tripEndDate",
+            "tripHasExpired",
+            "tripStartOdometer",
+            "tripEndOdometer",
+            "tripHasStartedByHost",
+            "tripHasStartedByRentee",
+            "tripHasEndedByHost",
+            "tripHasEndedByRentee",
+            "tripDays",
+            "tripDayLocas",
+            "tripPickupLocaLongitude",
+            "tripPickupLocaLatitude",
+            "tripReturnLocaLongitude",
+            "tripReturnLocaLatitude",
+            "ratingId",
+            "offerId"
+          ]
+        },
+        {
+          "FacetName": "tripId-ratingId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "tripId",
+            "SortKeyAlias": "ratingId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "tripId",
+            "ratingId",
+            "ratingIsVehiRecommended",
+            "ratingIsRenteeRecommended",
+            "ratingIsHostRecommended",
+            "ratingVehiDesByRentee",
+            "ratingHostDesByRenttee",
+            "ratingRenteeDesByHost",
+            "ratingVehiNoByRentee",
+            "ratingHostNoByRenttee",
+            "ratingRenteeNoByHost"
+          ]
+        },
+        {
+          "FacetName": "categoryId-categoryId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "cateId",
+            "SortKeyAlias": "cateId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "cateId",
+            "cateName",
+            "cateDescription"
+          ]
+        },
+        {
+          "FacetName": "classId-classId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "classId",
+            "SortKeyAlias": "classId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "classId",
+            "className",
+            "classDescription"
+          ]
+        },
+        {
+          "FacetName": "classId-vehiId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "classId",
+            "SortKeyAlias": "vehiId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "createdAt",
+            "vehiId",
+            "vehiName",
+            "vehiAvgRating",
+            "vehiKmPerL",
+            "vehiAvailableStartDate",
+            "vehiAvailableEndDate",
+            "vehiIsAvailable",
+            "hostId",
+            "cateId",
+            "cateName",
+            "classId",
+            "className",
+            "fuelId"
+          ]
+        },
+        {
+          "FacetName": "featureId-featureId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "featureId",
+            "SortKeyAlias": "featureId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "featureId",
+            "featureName",
+            "featureDescription",
+            "featureVehicles"
+          ]
+        },
+        {
+          "FacetName": "tagId-tagId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "tagId",
+            "SortKeyAlias": "tagId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "tagId",
+            "tagName",
+            "tagDescription",
+            "tagVehicles"
+          ]
+        },
+        {
+          "FacetName": "insurerId-insurerId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "insurerId",
+            "SortKeyAlias": "insurerId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "insurerId",
+            "insurerName",
+            "insurerDes",
+            "insurerVehis"
+          ]
+        },
+        {
+          "FacetName": "insurerId-vehiId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "insurerId",
+            "SortKeyAlias": "vehiId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "insurerId",
+            "insurerName"
+          ]
+        },
+        {
+          "FacetName": "fuelId-fuelId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "fuelId",
+            "SortKeyAlias": "fuelId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "fuelId",
+            "fuelType",
+            "fuelOctaneLvl",
+            "fuelDescription"
+          ]
+        },
+        {
+          "FacetName": "ratingId-ratingId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "ratingId",
+            "SortKeyAlias": "ratingId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "userId",
+            "hostId",
+            "tripId",
+            "ratingId",
+            "ratingIsVehiRecommended",
+            "ratingIsRenteeRecommended",
+            "ratingIsHostRecommended",
+            "ratingVehiDesByRentee",
+            "ratingHostDesByRenttee",
+            "ratingRenteeDesByHost",
+            "ratingVehiNoByRentee",
+            "ratingHostNoByRenttee",
+            "ratingRenteeNoByHost"
+          ]
+        },
+        {
+          "FacetName": "ratingId-tripId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "ratingId",
+            "SortKeyAlias": "tripId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "userId",
+            "hostId",
+            "tripId",
+            "ratingId"
+          ]
+        },
+        {
+          "FacetName": "offerId-offerId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "offerId",
+            "SortKeyAlias": "offerId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "userId",
+            "hostId",
+            "offerId",
+            "offerStartDate",
+            "offerEndDate",
+            "offerTripDays",
+            "offerHasExpired",
+            "offerAcceptedByHost",
+            "offerDays",
+            "offerDayLocas"
+          ]
+        },
+        {
+          "FacetName": "provinceId-provinceId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "provinceId",
+            "SortKeyAlias": "provinceId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "createdAt",
+            "provinceId",
+            "provinceName"
+          ]
+        },
+        {
+          "FacetName": "districtId-districtId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "districtId",
+            "SortKeyAlias": "districtId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "createdAt",
+            "districtName",
+            "districtId"
+          ]
+        },
+        {
+          "FacetName": "cityId-cityId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "cityId",
+            "SortKeyAlias": "cityId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "cityId",
+            "cityName"
+          ]
+        }
+      ],
+      "DataAccess": {
+        "MySql": {}
+      }
+    },
+    {
+      "TableName": "GoNowChatTable",
+      "KeyAttributes": {
+        "PartitionKey": {
+          "AttributeName": "PK",
+          "AttributeType": "S"
+        },
+        "SortKey": {
+          "AttributeName": "SK",
+          "AttributeType": "S"
+        }
+      },
+      "NonKeyAttributes": [
+        {
+          "AttributeName": "connectionId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "senderId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "receiverId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "createdAt",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "msgSeen",
+          "AttributeType": "BOOL"
+        },
+        {
+          "AttributeName": "msgContent",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "msgId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "connectionUserId",
+          "AttributeType": "S"
+        }
+      ],
+      "TableFacets": [
+        {
+          "FacetName": "receiverId-msgSeen_createdAt",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "receiverId",
+            "SortKeyAlias": "msgSeen_createdAt"
+          },
+          "TableData": [
+            {
+              "PK": {
+                "S": "RECEIVER#gune97"
+              },
+              "SK": {
+                "S": "false#2020-06-06"
+              },
+              "senderId": {
+                "S": "harry98"
+              },
+              "receiverId": {
+                "S": "gune97"
+              },
+              "createdAt": {
+                "S": "2020-06-06-21:17"
+              },
+              "msgSeen": {
+                "BOOL": false
+              },
+              "msgContent": {
+                "S": "This is fucking lorem ipsum"
+              }
+            }
+          ],
+          "NonKeyAttributes": [
+            "senderId",
+            "receiverId",
+            "createdAt",
+            "msgSeen",
+            "msgContent"
+          ],
+          "DataAccess": {
+            "MySql": {}
+          }
+        },
+        {
+          "FacetName": "connectionId-connectionUserId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "connectionId",
+            "SortKeyAlias": "connectionUserId"
+          },
+          "TableData": [
+            {
+              "PK": {
+                "S": "CONNECTION#89182jnj="
+              },
+              "SK": {
+                "S": "CONNECTION#gune97"
+              },
+              "connectionId": {
+                "S": "89182jnj="
+              },
+              "connectionUserId": {
+                "S": "gune97"
+              }
+            }
+          ],
+          "NonKeyAttributes": [
+            "connectionId",
+            "connectionUserId"
+          ],
+          "DataAccess": {
+            "MySql": {}
+          }
+        }
+      ],
+      "GlobalSecondaryIndexes": [
+        {
+          "IndexName": "CHAT-GSI_1",
+          "KeyAttributes": {
+            "PartitionKey": {
+              "AttributeName": "connectionUserId",
+              "AttributeType": "S"
+            },
+            "SortKey": {
+              "AttributeName": "connectionId",
+              "AttributeType": "S"
+            }
+          },
+          "Projection": {
+            "ProjectionType": "KEYS_ONLY"
+          }
+        }
+      ],
+      "DataAccess": {
+        "MySql": {}
+      }
+    }
+  ]
+}
