@@ -175,6 +175,138 @@ Resources:
           Properties:
             Bucket: !Ref GoNowVehicleImageBucket
             Events: s3:ObjectCreated:*
+  
+  #(07) Create an entry for image triggered by GoNowVehicleImageBucket.
+  GoNowPostWishlistItem:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowPostWishlistItem
+      Runtime: nodejs12.x
+      CodeUri: go-now-post-wishlist-item/
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles
+            Method: post
+
+  #(08) Create an entry for image triggered by GoNowVehicleImageBucket.
+  GoNowPostRating:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowPostRating
+      Runtime: nodejs12.x
+      CodeUri: go-now-post-rating/
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles
+            Method: post
+
+  #(09) Create an entry for image triggered by GoNowVehicleImageBucket.
+  GoNowPatchRating:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowPatchRating
+      Runtime: nodejs12.x
+      CodeUri: go-now-patch-rating/
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles
+            Method: post
+  
+  #(10) Create an entry for image triggered by GoNowVehicleImageBucket.
+  GoNowGetWishlist:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowGetWishlist
+      Runtime: nodejs12.x
+      CodeUri: go-now-get-wishlist/
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles
+            Method: post
+    
+  #(11) Create an entry for image triggered by GoNowVehicleImageBucket.
+  GoNowDeleteRating:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowDeleteRating
+      Runtime: nodejs12.x
+      CodeUri: go-now-delete-rating/
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles
+            Method: post
+  
+  #(12) Create an entry for image triggered by GoNowVehicleImageBucket.
+  GoNowDeleteWishlistItem:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.goNowDeleteWishlistItem
+      Runtime: nodejs12.x
+      CodeUri: go-now-delete-wishlist-item/
+      Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
+      Policies:
+        # Give DynamoDB Full Access to your Lambda Function
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowVehicleTable
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GoNowAPI
+            Path: /v1.0.0/private/vehicles
+            Method: post
 
   #
   #
