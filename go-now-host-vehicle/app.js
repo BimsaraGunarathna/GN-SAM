@@ -1,25 +1,103 @@
-// const axios = require('axios')
-// const url = 'http://checkip.amazonaws.com/';
-let response;
-
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Context doc: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html 
- * @param {Object} context
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- * 
- */
-
 const AWS = require('aws-sdk');
-const dynamodb = new AWS.DynamoDB({region: 'ap-south-1', apiVersion: '2012-08-10'});
+const dynamodb = new AWS.DynamoDB({ region: 'ap-southeast-1', apiVersion: '2012-08-10'});
 
-exports.goNowHostVehicle = async (event, context, callback) => {
-    
+//thrid party libraries.
+const ddbGeo = require('dynamodb-geo');
+
+//Environment variables
+const { BASE_TABLE_NAME, LOCATION_TABLE_NAME } = process.env;
+
+exports.goNowHostVehicle = (event, context, callback) => {
+        
+    //geohash configuaration
+    const config = new ddbGeo.GeoDataManagerConfiguration(dynamodb, LOCATION_TABLE_NAME);
+    const myGeoTableManager = new ddbGeo.GeoDataManager(config);
+
+    //eventually consistent reads, at half the cost
+    config.consistentRead = false;
+    //Use true([lon, lat]) for GeoJSON standard compliance. (default )
+    config.longitudeFirst = true;
+    //Dynamodb configuaration.
+    config.geohashAttributeName = "LSI_01";
+    config.hashKeyAttributeName = "PK";
+    // Pick a hashKeyLength appropriate to your usage
+    config.hashKeyLength = 6;
+    config.rangeKeyAttributeName = "SK";
+    config.geoJsonAttributeName = "geoJson";
+    config.geohashIndexName = "LSI_LOCA_01";
+
+
+    // Querying 100km from Cambridge, UK
+    myGeoTableManager.queryRadius({
+        RadiusInMeter: 100000,
+        CenterPoint: {
+            latitude: 51.51,
+            longitude: -0.13
+        }
+    })
+        // Print the results, an array of DynamoDB.AttributeMaps
+        .then(
+            (result) => {
+                console.log('RESULT');
+                console.log(result);
+                if (result.length == 0) {
+
+                    myGeoTableManager.putPoint({
+                        RangeKeyValue: { S: '1234' }, // Use this to ensure uniqueness of the hash/range pairs.
+                        GeoPoint: { // An object specifying latitutde and longitude as plain numbers. Used to build the geohash, the hashkey and geojson data
+                            latitude: 51.51,
+                            longitude: -0.13
+                        },
+                        PutItemInput: { // Passed through to the underlying DynamoDB.putItem request. TableName is filled in for you.
+                            Item: { // The primary key, geohash and geojson data is filled in for you
+                                country: { S: 'Old Empire' }, // Specify attribute values using { type: value } objects, like the DynamoDB API.
+                                capital: { S: 'London' }
+                            },
+                            // ... Anything else to pass through to `putItem`, eg ConditionExpression
+                        }
+                    })
+                        .promise()
+                        .then(
+                            console.log('Done! putting new point.')
+                        )
+                        .catch((err) => {
+                            console.log('Error happened! Bit of fucked up at putting new point.')
+                            console.log(err)
+                        });
+
+                } else {
+                    myGeoTableManager.updatePoint({
+                        RangeKeyValue: { S: '1234' },
+                        GeoPoint: { // An object specifying latitutde and longitude as plain numbers.
+                            latitude: 51.51,
+                            longitude: -0.13
+                        },
+                        UpdateItemInput: { // TableName and Key are filled in for you
+                            UpdateExpression: 'SET country = :newName',
+                            ExpressionAttributeValues: {
+                                ':newName': { S: 'God bless the Queen' }
+                            }
+                        }
+                    })
+                        .promise()
+                        .then(() => { console.log('Done! updatting exsiting point.') })
+                        .catch(() => { console.log('Error happened! updatting exsiting point.') });
+                }
+
+            }
+
+        )
+        .then( () => {
+            console.log('Done! query found matching Geo Hash.')
+        })
+        .catch(
+            (err) => {
+                console.log('Error happened! Geo Hash query failed.');
+                console.log(err);
+            }
+        );
+
+    //Putting a new vehicle record to the Base table.    
     var newVehicleId = 'vehicleId_' + (Math.random());
     const params = {
         Item: {
@@ -99,7 +177,7 @@ exports.goNowHostVehicle = async (event, context, callback) => {
                 S: event.vehicleTripId
             }
         },
-        TableName: "go-now-vehicle-table"
+        TableName: BASE_TABLE_NAME
     };
     dynamodb.putItem(params, function(err, data) {
         if (err) {

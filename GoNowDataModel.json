@@ -3,7 +3,7 @@
   "ModelMetadata": {
     "Author": "BGD",
     "DateCreated": "May 31, 2020, 04:29 PM",
-    "DateLastModified": "Jun 06, 2020, 09:33 PM",
+    "DateLastModified": "Jun 07, 2020, 08:10 PM",
     "Description": "Basic model for the GoNow app.",
     "Version": "1.0"
   },
@@ -659,6 +659,18 @@
         },
         {
           "AttributeName": "offerDayLocas",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "currentLocationId",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "currentLocaLatitude",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "currentLocaLongitude",
           "AttributeType": "S"
         }
       ],
@@ -1377,6 +1389,69 @@
             "cityId",
             "cityName"
           ]
+        },
+        {
+          "FacetName": "currentLocationId-currentLocationId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "currentLocationId",
+            "SortKeyAlias": "currentLocationId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "currentLocationId",
+            "currentLocaLatitude",
+            "currentLocaLongitude"
+          ]
+        },
+        {
+          "FacetName": "currentLocationId-vehiId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "currentLocationId",
+            "SortKeyAlias": "vehiId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "versionNo",
+            "createdAt",
+            "vehiId",
+            "currentLocationId",
+            "currentLocaLatitude",
+            "currentLocaLongitude"
+          ]
+        },
+        {
+          "FacetName": "categoryId-vehiId-facet",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "categoryId",
+            "SortKeyAlias": "vehiId"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "vehiId",
+            "cateId",
+            "cateName"
+          ]
+        }
+      ],
+      "GlobalSecondaryIndexes": [
+        {
+          "IndexName": "BASE-GSI_1",
+          "KeyAttributes": {
+            "PartitionKey": {
+              "AttributeName": "SK",
+              "AttributeType": "S"
+            },
+            "SortKey": {
+              "AttributeName": "PK",
+              "AttributeType": "S"
+            }
+          },
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
         }
       ],
       "DataAccess": {
@@ -1431,10 +1506,10 @@
       ],
       "TableFacets": [
         {
-          "FacetName": "receiverId-msgSeen_createdAt",
+          "FacetName": "receiverId-createdAt",
           "KeyAttributeAlias": {
             "PartitionKeyAlias": "receiverId",
-            "SortKeyAlias": "msgSeen_createdAt"
+            "SortKeyAlias": "createdAt"
           },
           "TableData": [
             {
@@ -1467,10 +1542,7 @@
             "createdAt",
             "msgSeen",
             "msgContent"
-          ],
-          "DataAccess": {
-            "MySql": {}
-          }
+          ]
         },
         {
           "FacetName": "connectionId-connectionUserId-facet",
@@ -1497,10 +1569,7 @@
           "NonKeyAttributes": [
             "connectionId",
             "connectionUserId"
-          ],
-          "DataAccess": {
-            "MySql": {}
-          }
+          ]
         }
       ],
       "GlobalSecondaryIndexes": [

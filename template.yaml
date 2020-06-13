@@ -2,13 +2,16 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Simple CRUD webservice. State is stored in a SimpleTable (DynamoDB) resource.
 
+#
+#
+#
 Outputs:
   GoNowAPIUrl:
     Value: !Sub "https://${GoNowAPI}.execute-api.${AWS::Region}.amazonaws.com/${!GetAtt GoNowAPI.StageName}/"
 
-  ConnectionsTableArn:
+  GoNowChatTableArn:
     Description: "Connections table ARN"
-    Value: !GetAtt ConnectionsTable.Arn
+    Value: !GetAtt GoNowChatTable.Arn
 
   GoNowChatOnConnectArn:
     Description: "OnConnect function ARN"
@@ -35,18 +38,11 @@ Parameters:
       - prodStage
     Description: devStage, prodStage
 
-  #for GoNowChat feature
-  TableName:
-    Type: String
-    Default: 'GoNowChatTable'
-    Description: (Required) The name of the new DynamoDB to store connection identifiers for each connected clients. Minimum 3 characters
-    MinLength: 3
-    MaxLength: 50
-    AllowedPattern: ^[A-Za-z_]+$
-    ConstraintDescription: 'Required. Can be characters and underscore only. No numbers or special characters allowed.'
-
-
+#
+#
+#
 Resources:
+
   #
   #
   #(01) get vehicle from gn-vehicle-table for unauthenticated users.
@@ -59,7 +55,7 @@ Resources:
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -79,12 +75,12 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-delete-vehicle/
       Role: !GetAtt GoNowBasicDeleteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -100,11 +96,11 @@ Resources:
       Handler: app.goNowGetPrivateVehicleList
       Runtime: nodejs12.x
       CodeUri: go-now-get-private-vehicle-list/
-      Policies: AmazonS3ReadOnlyAccess
+      #Policies: AmazonS3ReadOnlyAccess
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -121,12 +117,12 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-patch-vehicle/
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -142,13 +138,16 @@ Resources:
       Handler: app.goNowHostVehicle
       Runtime: nodejs12.x
       CodeUri: go-now-host-vehicle/
+      MemorySize: 384
+      Timeout: 12
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          BASE_TABLE_NAME: !Ref GoNowBaseTable
+          LOCATION_TABLE_NAME: !Ref GoNowLocationTable
       Events:
         GetResource:
           Type: Api
@@ -168,7 +167,7 @@ Resources:
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         PhotoUpload:
           Type: S3
@@ -184,12 +183,12 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-post-wishlist-item/
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -206,12 +205,12 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-post-rating/
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -228,12 +227,12 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-patch-rating/
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -250,12 +249,12 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-get-wishlist/
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -271,13 +270,15 @@ Resources:
       Handler: app.goNowDeleteRating
       Runtime: nodejs12.x
       CodeUri: go-now-delete-rating/
+      MemorySize: 128
+      Timeout: 3
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -294,12 +295,12 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: go-now-delete-wishlist-item/
       Role: !GetAtt GoNowBasicReadWriteLambdaRole.Arn
-      Policies:
+      #Policies:
         # Give DynamoDB Full Access to your Lambda Function
-        - AmazonDynamoDBFullAccess
+        #- AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref GoNowVehicleTable
+          TABLE_NAME: !Ref GoNowBaseTable
       Events:
         GetResource:
           Type: Api
@@ -307,6 +308,81 @@ Resources:
             RestApiId: !Ref GoNowAPI
             Path: /v1.0.0/private/vehicles
             Method: post
+
+  #(13) Create connection to websocket. (GoNowChat Function 01)
+  GoNowChatOnConnect:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: onconnect/
+      Handler: app.onConnect
+      MemorySize: 256
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowChatTable
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref GoNowChatTable
+  OnConnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SimpleChatWebSocket
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GoNowChatOnConnect
+      Principal: apigateway.amazonaws.com
+      
+  #(14) Disconnect from websocket. (GoNowChat Function 02)
+  GoNowChatOnDisconnect:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ondisconnect/
+      Handler: app.onDisconnect
+      MemorySize: 256
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowChatTable
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref GoNowChatTable
+  OnDisconnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SimpleChatWebSocket
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GoNowChatOnDisconnect
+      Principal: apigateway.amazonaws.com
+      
+  #(15) Send message. (GoNowChat Function 03)
+  GoNowChatSendMessage:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sendmessage/
+      Handler: app.sendMessage
+      MemorySize: 256
+      Runtime: nodejs12.x
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowChatTable
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref GoNowChatTable
+      - Statement:
+        - Effect: Allow
+          Action:
+          - 'execute-api:ManageConnections'
+          Resource:
+          - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatWebSocket}/*'
+  SendMessagePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SimpleChatWebSocket
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GoNowChatSendMessage
+      Principal: apigateway.amazonaws.com
 
   #
   #
@@ -322,7 +398,7 @@ Resources:
   #
   #
   #IAM:Role
-  #grant read and write GoNowVehicleTable dynamodb table for lambda.
+  #grant read and write GoNowBaseTable dynamodb table for lambda.
   GoNowBasicReadWriteLambdaRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -346,8 +422,8 @@ Resources:
                   - "dynamodb:BatchGetItem"
                   - "dynamodb:BatchWriteItem"
                   - "dynamodb:ConditionCheckItem"
-                  - "dynamodb:DescribeStream"
-                  - "dynamodb:DescribeTable"
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:DescribeTimeToLive"
                   - "dynamodb:GetItem"
                   - "dynamodb:GetRecords"
                   - "dynamodb:GetShardIterator"
@@ -355,14 +431,20 @@ Resources:
                   - "dynamodb:Query"
                   - "dynamodb:Scan"
                   - "dynamodb:UpdateItem"
-                Resource: !GetAtt GoNowVehicleTable.Arn
-  #                Fn::Join:
-  #                  - ""
-  #                  - - "arn:aws:dynamodb:"
-  #                    - Ref: "GoNowVehicleTable"
-  #                    - ""
+                Resource: 
+                  
+                  - !GetAtt GoNowLocationTable.Arn
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/*'] ]
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/index/'] ]
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/index/*'] ]
 
-  #grant read and delete GoNowVehicleTable dynamodb table item for lambda.
+                  - !GetAtt GoNowBaseTable.Arn
+                  - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/*'] ]
+                  - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/index/'] ]
+                  - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/index/*'] ]
+
+#${GoNowChatOnDisconnect.Arn}/invocations
+  #grant read and delete GoNowBaseTable dynamodb table item for lambda.
   GoNowBasicDeleteLambdaRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -385,7 +467,17 @@ Resources:
                 Action:
                   - "dynamodb:DeleteItem"
                   - "dynamodb:GetItem"
-                Resource: !GetAtt GoNowVehicleTable.Arn
+                Resource: 
+                  
+                  - !GetAtt GoNowLocationTable.Arn
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/*'] ]
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/index/'] ]
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/index/*'] ]
+
+                  - !GetAtt GoNowBaseTable.Arn
+                  - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/*'] ]
+                  - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/index/'] ]
+                  - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/index/*'] ]
 
   #
   #
@@ -436,23 +528,91 @@ Resources:
   #
   #DynamoDB Tables
   #(01) configure primary dynamodb table
-  GoNowVehicleTable:
+  GoNowBaseTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: "vehicleId"
+        - AttributeName: "PK"
           AttributeType: "S"
-        - AttributeName: "hostId"
+        - AttributeName: "SK"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "vehicleId"
+        - AttributeName: "PK"
           KeyType: "HASH"
-        - AttributeName: "hostId"
+        - AttributeName: "SK"
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-      TableName: "gn-vehicle-table"
+      TableName: "GoNowBaseTable"
+
+  #(02) configure location table for GoNow app.
+  GoNowLocationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "PK"
+          AttributeType: "N"
+        - AttributeName: "SK"
+          AttributeType: "S"
+        - AttributeName: "LSI_01"
+          AttributeType: "N"
+      LocalSecondaryIndexes: 
+      - IndexName: "LSI_LOCA_01"
+        KeySchema: 
+          - AttributeName: "PK"
+            KeyType: "HASH"
+          - AttributeName: "LSI_01"
+            KeyType: "RANGE"
+        Projection:
+          ProjectionType: "ALL"
+      KeySchema:
+        - AttributeName: "PK"
+          KeyType: "HASH"
+        - AttributeName: "SK"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "GoNowLocationTable"
+
+  #(03) configure chat table
+  GoNowChatTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: "PK"
+        AttributeType: "S"
+      - AttributeName: "SK"
+        AttributeType: "S"
+      - AttributeName: "connectionUserId"
+        AttributeType: "S"
+      - AttributeName: "connectionId"
+        AttributeType: "S"
+      KeySchema:
+      - AttributeName: "PK"
+        KeyType: "HASH"
+      - AttributeName: "SK"
+        KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled: True
+      TableName: "GoNowChatTable"
+      GlobalSecondaryIndexes:
+      - IndexName: "GSI_01"
+        KeySchema:
+          - AttributeName: "connectionUserId"
+            KeyType: "HASH"
+          - AttributeName: "connectionId"
+            KeyType: "RANGE"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+        ProvisionedThroughput:
+          ReadCapacityUnits: '5'
+          WriteCapacityUnits: '5'
+
 
   #
   #
@@ -724,112 +884,3 @@ Resources:
       Description: Prod Stage
       DeploymentId: !Ref Deployment
       ApiId: !Ref SimpleChatWebSocket
-  ConnectionsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: "PK"
-        AttributeType: "S"
-      - AttributeName: "SK"
-        AttributeType: "S"
-      - AttributeName: "connectionUserId"
-        AttributeType: "S"
-      - AttributeName: "connectionId"
-        AttributeType: "S"
-      KeySchema:
-      - AttributeName: "PK"
-        KeyType: "HASH"
-      - AttributeName: "SK"
-        KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-      SSESpecification:
-        SSEEnabled: True
-      TableName: !Ref TableName
-      GlobalSecondaryIndexes:
-      - IndexName: "GSI_1"
-        KeySchema:
-          - AttributeName: "connectionUserId"
-            KeyType: "HASH"
-          - AttributeName: "connectionId"
-            KeyType: "RANGE"
-        Projection:
-          ProjectionType: "KEYS_ONLY"
-        ProvisionedThroughput:
-          ReadCapacityUnits: '5'
-          WriteCapacityUnits: '5'
-  #(GoNowChat Function 01)
-  GoNowChatOnConnect:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: onconnect/
-      Handler: app.onConnect
-      MemorySize: 256
-      Runtime: nodejs12.x
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref TableName
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName: !Ref TableName
-  OnConnectPermission:
-    Type: AWS::Lambda::Permission
-    DependsOn:
-      - SimpleChatWebSocket
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref GoNowChatOnConnect
-      Principal: apigateway.amazonaws.com
-      
-  #(GoNowChat Function 02)
-  GoNowChatOnDisconnect:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ondisconnect/
-      Handler: app.onDisconnect
-      MemorySize: 256
-      Runtime: nodejs12.x
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref TableName
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName: !Ref TableName
-  OnDisconnectPermission:
-    Type: AWS::Lambda::Permission
-    DependsOn:
-      - SimpleChatWebSocket
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref GoNowChatOnDisconnect
-      Principal: apigateway.amazonaws.com
-      
-  #(GoNowChat Function 03)
-  GoNowChatSendMessage:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: sendmessage/
-      Handler: app.sendMessage
-      MemorySize: 256
-      Runtime: nodejs12.x
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref TableName
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName: !Ref TableName
-      - Statement:
-        - Effect: Allow
-          Action:
-          - 'execute-api:ManageConnections'
-          Resource:
-          - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SimpleChatWebSocket}/*'
-  SendMessagePermission:
-    Type: AWS::Lambda::Permission
-    DependsOn:
-      - SimpleChatWebSocket
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref GoNowChatSendMessage
-      Principal: apigateway.amazonaws.com
