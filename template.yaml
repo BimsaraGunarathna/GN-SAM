@@ -384,6 +384,30 @@ Resources:
       FunctionName: !Ref GoNowChatSendMessage
       Principal: apigateway.amazonaws.com
 
+  #(16) Add data to ES from Dynamodb when new records are created.
+  GoNowDynamodbESTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: go-now-dynamodb-es-trigger/
+      Handler: app.goNowDynamodbESTrigger
+      MemorySize: 256
+      Timeout: 12
+      Runtime: nodejs12.x
+      Role: !GetAtt GoNowDynamodbESTriggerLambdaRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GoNowLocationTable
+      Events: 
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: 
+              !GetAtt GoNowLocationTable.StreamArn   # This must be the name of a DynamoDB table declared in the same template file
+            StartingPosition: LATEST
+            BatchSize: 10
+            Enabled: true
+
+
   #
   #
   #IAM::User
@@ -398,7 +422,7 @@ Resources:
   #
   #
   #IAM:Role
-  #grant read and write GoNowBaseTable dynamodb table for lambda.
+  #(01) grant read and write GoNowBaseTable dynamodb table for lambda.
   GoNowBasicReadWriteLambdaRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -443,8 +467,8 @@ Resources:
                   - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/index/'] ]
                   - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/index/*'] ]
 
-#${GoNowChatOnDisconnect.Arn}/invocations
-  #grant read and delete GoNowBaseTable dynamodb table item for lambda.
+  #${GoNowChatOnDisconnect.Arn}/invocations
+  #(02) grant read and delete GoNowBaseTable dynamodb table item for lambda.
   GoNowBasicDeleteLambdaRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -479,6 +503,102 @@ Resources:
                   - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/index/'] ]
                   - !Join [ '', [ !GetAtt GoNowBaseTable.Arn, '/index/*'] ]
 
+  #(03) grant access dynamodb trigger, cloudwatch and ES for the lambda function: GoNowDynamodbESTrigger.
+  GoNowDynamodbESTriggerLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        #Policy 01
+        - PolicyName: "GoNowDynamodbTriggerPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "dynamodb:BatchGetItem"
+                  - "dynamodb:BatchWriteItem"
+                  - "dynamodb:ConditionCheckItem"
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:DescribeTimeToLive"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "dynamodb:UpdateItem"
+                  - "dynamodb:DescribeStream"
+                  - "dynamodb:GetRecords"
+                  - "dynamodb:GetShardIterator"
+                  - "dynamodb:ListStreams"
+                  
+                Resource: 
+                  
+                  - !GetAtt GoNowLocationTable.Arn
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/*'] ]
+
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/index/'] ]
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/index/*'] ]
+
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/stream/'] ]
+                  - !Join [ '', [ !GetAtt GoNowLocationTable.Arn, '/stream/*'] ]
+        
+        #Policy 02
+        - PolicyName: "GoNowESTriggerPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "es:AcceptInboundCrossClusterSearchConnection"
+                  - "es:CreateOutboundCrossClusterSearchConnection"
+                  - "es:DescribeElasticsearchDomain"
+                  - "es:DescribeElasticsearchDomainConfig"
+                  - "es:DescribeElasticsearchDomains"
+                  - "es:DescribeElasticsearchInstanceTypeLimits"
+                  - "es:DescribeInboundCrossClusterSearchConnections"
+                  - "es:ESCrossClusterGet"
+                  - "es:ESHttpDelete"
+                  - "es:ESHttpGet"
+                  - "es:ESHttpHead"
+                  - "es:ESHttpPatch"
+                  - "es:ESHttpPost"
+                  - "es:ESHttpPut"
+                  - "es:ListDomainNames"
+                  - "es:ListElasticsearchInstanceTypeDetails"
+                  - "es:ListElasticsearchInstanceTypes"
+                  - "es:ListElasticsearchVersions"
+                  - "es:ListTags"
+                  - "es:UpgradeElasticsearchDomain"
+                Resource: 
+                  - "arn:aws:es:ap-southeast-1:932203614124:domain/gn-elasticsearch"
+
+        #Policy 03
+        - PolicyName: "GoNowCloudwatchLambdaTriggerPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "logs:DescribeLogGroups"
+                  - "logs:DescribeLogStreams"
+                  - "logs:DescribeSubscriptionFilters"
+                  - "logs:GetLogEvents"
+                  - "logs:FilterLogEvents"
+                Resource: 
+                  - "*"
+          
   #
   #
   #s3
@@ -575,6 +695,8 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "GoNowLocationTable"
+      StreamSpecification: 
+        StreamViewType: "NEW_IMAGE"
 
   #(03) configure chat table
   GoNowChatTable:

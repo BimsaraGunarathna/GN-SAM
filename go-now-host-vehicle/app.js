@@ -13,7 +13,7 @@ exports.goNowHostVehicle = (event, context, callback) => {
     const config = new ddbGeo.GeoDataManagerConfiguration(dynamodb, LOCATION_TABLE_NAME);
     const myGeoTableManager = new ddbGeo.GeoDataManager(config);
 
-    //eventually consistent reads, at half the cost
+    //eventually consistent reads, at half the cost.
     config.consistentRead = false;
     //Use true([lon, lat]) for GeoJSON standard compliance. (default )
     config.longitudeFirst = true;
